@@ -1,0 +1,21 @@
+# RStudio files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Compiled C++ objects
+src/*.o
+src/*.so
+src/*.dll
+src/*.a
+
+# Package build and check artifacts
+/*.tar.gz
+/*.Rcheck/
+
+# Documentation and temporary files
+revdep/
+.DS_Store
+.httr-oauth
+.quarto
