@@ -24,8 +24,6 @@ pak::pak("yunbinam128/ordinal2phase")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
 ``` r
 library(ordinal2phase)
 ```
