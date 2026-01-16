@@ -82,27 +82,24 @@ smle_po <- function (formula, data_R1, data_R0, Bspline_R1, Bspline_R0, Xterm,
   nparams <- length(theta_hat)
   n_tot <- ws$n_R1 + ws$n_R0
   hn <- hnscale * (n_tot^(-1/2))
-  pl_1d <- numeric(nparams)
-  pl_2d <- matrix(NA_real_, nrow = nparams, ncol = nparams)
+  e_mat <- diag(rep(hn, nparams))
   Hess_mat <- matrix(NA_real_, nrow = nparams, ncol = nparams)
+  pl_2d <- matrix(NA_real_, nrow = nparams, ncol = nparams)
+  pl_1d <- numeric(nparams)
+
   for (i in seq_len(nparams)) {
-    # Perturb i
-    theta_pert_i <- theta_hat
-    theta_pert_i[i] <- theta_hat[i] + hn
-
-    # Calculate 1st order perturbation
-    pl_1d[i] <- smle_profile_loglik(theta_pert_i, p_kj, ws, tol, maxiter)
-
     for (j in i:nparams) {
-      # Perturb i and j (Off-diagonal elements)
-      theta_pert_ij <- theta_hat
-      theta_pert_ij[i] <- theta_hat[i] + hn
-      theta_pert_ij[j] <- theta_hat[j] + hn
-
-      # Calculate 2nd order perturbation
-      val_ij <- smle_profile_loglik(theta_pert_ij, p_kj, ws, tol, maxiter)
-      pl_2d[i, j] <- pl_2d[j, i] <- val_ij
+      theta_pert <- as.numeric(theta_hat + e_mat[i, ] + e_mat[j, ])
+      pl_2d[i, j] <- pl_2d[j, i] <- smle_profile_loglik(
+        theta_hat_fixed = theta_pert, p_kj_init = p_kj, ws = ws,
+        tol = tol, maxiter = maxiter, verbose = FALSE)
     }
+  }
+  for (i in seq_len(nparams)) {
+    theta_pert <- as.numeric(theta_hat + e_mat[i, ])
+    pl_1d[i] <- smle_profile_loglik(
+      theta_hat_fixed = theta_pert, p_kj_init = p_kj, ws = ws,
+      tol = tol, maxiter = maxiter, verbose = FALSE)
   }
 
   for (i in seq_len(nparams)) {
